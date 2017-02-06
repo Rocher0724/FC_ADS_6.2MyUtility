@@ -48,16 +48,5 @@ public class ThreeFragment extends Fragment {
 
         return view;
     }
-    private void goUrl(String url){
-        // 1. 유효성 검사
-        if(url != null && !url.equals("")) {
-            // 2. 프로토콜 검사
-            if (!url.startsWith("http://") && !url.startsWith("https://")){
-                url = "http://" + url;
-            }
-            // 3. url 이동
-            webView.loadUrl(url);
-        }
-    }
 
 }
