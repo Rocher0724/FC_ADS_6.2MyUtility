@@ -16,7 +16,6 @@ public class MainActivity extends AppCompatActivity {
     TwoFragment two;
     ThreeFragment three;
     FourFragment four;
-//    TabLayout tabLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,6 +25,8 @@ public class MainActivity extends AppCompatActivity {
         // 프래그먼트 init
         one = new OneFragment();
         two = new TwoFragment();
+        two.setContext(this);
+
         three = new ThreeFragment();
         four = new FourFragment();
 
