@@ -26,11 +26,6 @@ public class FourFragment extends Fragment implements OnMapReadyCallback {
         // Required empty public constructor
     }
 
-//    @Override
-//    public void onResume() {
-//        super.onResume();
-//        mapView.getMapAsync(this);
-//    }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -43,6 +38,7 @@ public class FourFragment extends Fragment implements OnMapReadyCallback {
         return view;
     }
 
+    // MapsActivity에 있는 onMapReady 파일 그대로 Override
     @Override
     public void onMapReady(GoogleMap googleMap) {
         map = googleMap;
