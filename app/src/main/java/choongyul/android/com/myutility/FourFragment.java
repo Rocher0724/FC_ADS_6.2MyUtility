@@ -1,8 +1,6 @@
 package choongyul.android.com.myutility;
 
 
-import android.*;
-import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Location;
