@@ -1,12 +1,28 @@
 package choongyul.android.com.myutility;
 
+import android.*;
+import android.Manifest;
+import android.annotation.TargetApi;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Debug;
+import android.provider.Settings;
+import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.widget.Toast;
+
+import java.util.Set;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -17,11 +33,28 @@ public class MainActivity extends AppCompatActivity {
     ThreeFragment three;
     FourFragment four;
 
+
+    private final int REQ_CODE = 100;
+
+    private LocationManager manager;
+    public LocationManager getLoactionManager() {
+        return manager;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // 메써드 추적 시작 - 마시멜로우 이상에서 다운
+//        Debug.startMethodTracing("trace_result");
+
+        // 프레그먼트 init
+        init();
+
+    }
+
+    public void init() {
         // 프래그먼트 init
         one = new OneFragment();
         two = new TwoFragment();
@@ -49,6 +82,66 @@ public class MainActivity extends AppCompatActivity {
 
         // 2. 탭이 변경되었을 때 페이지를 바꿔주는 리스너
         tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(viewPager));
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            checkPermission();
+        } else {
+            gpsChecker();
+        }
+
+    }
+
+
+    public void gpsChecker() {
+        // LocationManager 객체를 얻어온다
+        manager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        // GPS 센서가 켜져있는지 확인
+        // 꺼져있다면 GPS를 켜는 페이지로 이동
+        if(!gpsCheck()) {
+            // 팝업창 만들기
+            AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
+
+            // 1. 팝업창 제목
+            alertDialog.setTitle("GPS 켜기");
+            // 2. 팝업창 메시지
+            alertDialog.setMessage("GPS 꺼져있습니다. \n 설정창으로 이동하시겠습니까?");
+            // 3. yes 버튼 생성
+            alertDialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                    startActivity(intent);
+                }
+            });
+
+            // 4. no 버튼 생성
+            alertDialog.setNegativeButton("no", new DialogInterface.OnClickListener() {
+
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.cancel();
+                }
+            });
+            alertDialog.show();
+
+        }
+        // 메서드 추적 종료 - 마시멜로우 이상에서 다운.
+//        Debug.stopMethodTracing();
+    }
+
+    // gps가 꺼져있는지 체크. 롤리팝 이하버전
+    private boolean gpsCheck() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            return manager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        } else {
+            String gps = android.provider.Settings.Secure.getString(getContentResolver()
+                    , Settings.Secure.LOCATION_PROVIDERS_ALLOWED);
+            if(gps.matches(".*gps.*")) {
+                return true;
+            } else {
+                return false;
+            }
+        }
     }
 
     class PagerAdapter extends FragmentStatePagerAdapter {
@@ -74,4 +167,42 @@ public class MainActivity extends AppCompatActivity {
             return TAB_COUNT;
         }
     }
+
+    // 1. 권한체크
+    @TargetApi(Build.VERSION_CODES.M)
+    private void checkPermission() {
+        // 1.1 런타임 권한체크 (권한을 추가할때 1.2 목록작성과 2.1 권한체크에도 추가해야한다.)
+        if ( checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                || checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+
+            // 1.2 요청할 권한 목록 작성
+            String permArr[] = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
+
+            // 1.3 시스템에 권한요청
+            requestPermissions(permArr, REQ_CODE);
+
+        } else {
+            gpsChecker();
+        }
+    }
+
+    // 2. 권한체크 후 콜백 - 사용자가 확인 후 시스템이 호출하는 함수
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if( requestCode == REQ_CODE) {
+            // 2.1 배열에 넘긴 런타임 권한을 체크해서 승인이 됐으면
+            if(grantResults[0] == PackageManager.PERMISSION_GRANTED
+                    && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
+                // 2.2 프로그램 실행
+                gpsChecker();
+            } else {
+                Toast.makeText(this, "권한을 허용하지 않으시면 프로그램을 실행할 수 없습니다.", Toast.LENGTH_SHORT).show();
+                // 선택 : 1 종료, 2 권한체크 다시물어보기 할수도 있다. 일단은 끝내기
+                finish();
+            }
+        }
+    }
 }
+

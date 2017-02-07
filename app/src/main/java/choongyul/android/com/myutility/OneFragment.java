@@ -41,6 +41,8 @@ public class OneFragment extends Fragment {
     String strarr[];
     double realResult = 0;
 
+    View view;
+
     ArrayList<String> list = new ArrayList<>();
 
     public OneFragment() {
@@ -51,12 +53,18 @@ public class OneFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_one, container, false);
 
-        // 2. 정의된 위젯변수에 xml의 위젯 id를 가져와서 담아준다.
+        // 뷰를 재사용하기 위해holder 형태로 만들어준다.
+        if ( view!=null) {
+            return view;
+        }
+
+
+        view = inflater.inflate(R.layout.fragment_one, container, false);
+
+        // 실제 위젯 주입
         result = (TextView) view.findViewById(R.id.result);
         testSideView = (TextView) view.findViewById(R.id.testSide);
-
 
         btn0 = (Button) view.findViewById(R.id.btn0);
         btn1 = (Button) view.findViewById(R.id.btn1);
@@ -156,92 +164,92 @@ public class OneFragment extends Fragment {
     View.OnClickListener clickListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-            switch (view.getId()) {
-                case R.id.btn0:
-                    testSideView.setText(testSideView.getText() + "0");
-                    break;
-                case R.id.btn1:
-                    testSideView.setText(testSideView.getText() + "1");
-                    break;
-                case R.id.btn2:
-                    testSideView.setText(testSideView.getText() + "2");
-                    break;
-                case R.id.btn3:
-                    testSideView.setText(testSideView.getText() + "3");
-                    break;
-                case R.id.btn4:
-                    testSideView.setText(testSideView.getText() + "4");
-                    break;
-                case R.id.btn5:
-                    testSideView.setText(testSideView.getText() + "5");
-                    break;
-                case R.id.btn6:
-                    testSideView.setText(testSideView.getText() + "6");
-                    break;
-                case R.id.btn7:
-                    testSideView.setText(testSideView.getText() + "7");
-                    break;
-                case R.id.btn8:
-                    testSideView.setText(testSideView.getText() + "8");
-                    break;
-                case R.id.btn9:
-                    testSideView.setText(testSideView.getText() + "9");
-                    break;
+        switch (view.getId()) {
+            case R.id.btn0:
+                testSideView.setText(testSideView.getText() + "0");
+                break;
+            case R.id.btn1:
+                testSideView.setText(testSideView.getText() + "1");
+                break;
+            case R.id.btn2:
+                testSideView.setText(testSideView.getText() + "2");
+                break;
+            case R.id.btn3:
+                testSideView.setText(testSideView.getText() + "3");
+                break;
+            case R.id.btn4:
+                testSideView.setText(testSideView.getText() + "4");
+                break;
+            case R.id.btn5:
+                testSideView.setText(testSideView.getText() + "5");
+                break;
+            case R.id.btn6:
+                testSideView.setText(testSideView.getText() + "6");
+                break;
+            case R.id.btn7:
+                testSideView.setText(testSideView.getText() + "7");
+                break;
+            case R.id.btn8:
+                testSideView.setText(testSideView.getText() + "8");
+                break;
+            case R.id.btn9:
+                testSideView.setText(testSideView.getText() + "9");
+                break;
 
 
-                case R.id.btnPlus:
-                    if (previous > 0) {
-                        testSideView.setText(previous + "+");
+            case R.id.btnPlus:
+                if (previous > 0) {
+                    testSideView.setText(previous + "+");
 
-                    } else {
-                        testSideView.setText(testSideView.getText() + "+");
-                    }
-                    break;
+                } else {
+                    testSideView.setText(testSideView.getText() + "+");
+                }
+                break;
 
-                case R.id.btnMinus:
-                    if (previous > 0) {
-                        testSideView.setText(previous + "-");
-                    } else {
-                        testSideView.setText(testSideView.getText() + "-");
-                    }
-                    break;
+            case R.id.btnMinus:
+                if (previous > 0) {
+                    testSideView.setText(previous + "-");
+                } else {
+                    testSideView.setText(testSideView.getText() + "-");
+                }
+                break;
 
-                case R.id.btnMul:
-                    if (previous > 0) {
-                        testSideView.setText(previous + "X");
-                    } else {
-                        testSideView.setText(testSideView.getText() + "X");
-                    }
-                    break;
+            case R.id.btnMul:
+                if (previous > 0) {
+                    testSideView.setText(previous + "X");
+                } else {
+                    testSideView.setText(testSideView.getText() + "X");
+                }
+                break;
 
-                case R.id.btnDivide:
-                    if (previous > 0) {
-                        testSideView.setText(previous + "/");
-                    } else {
-                        testSideView.setText(testSideView.getText() + "/");
-                    }
-                    break;
+            case R.id.btnDivide:
+                if (previous > 0) {
+                    testSideView.setText(previous + "/");
+                } else {
+                    testSideView.setText(testSideView.getText() + "/");
+                }
+                break;
 
 
-                case R.id.btnRun:
-                    strarr = testSideView.getText().toString().split("(?<=[X/+-])|(?=[X/+-])");
+            case R.id.btnRun:
+                strarr = testSideView.getText().toString().split("(?<=[X/+-])|(?=[X/+-])");
 
-                    for (String item : strarr) {
-                        list.add(item);
-                    }
+                for (String item : strarr) {
+                    list.add(item);
+                }
 
-                    String reresult = evaluate(list) + "";
-                    result.setText(reresult);
-                    previous = realResult;
-                    list.clear();
-                    break;
-                case R.id.btnCancel:
-                    previous = 0;
-                    nextNum = 0;
-                    result.setText("");
-                    testSideView.setText("");
-                    break;
-            }
+                String reresult = evaluate(list) + "";
+                result.setText(reresult);
+                previous = realResult;
+                list.clear();
+                break;
+            case R.id.btnCancel:
+                previous = 0;
+                nextNum = 0;
+                result.setText("");
+                testSideView.setText("");
+                break;
+        }
         }
     };
 }
