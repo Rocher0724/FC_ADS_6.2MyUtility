@@ -81,9 +81,9 @@ public class MainActivity extends AppCompatActivity {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             checkPermission();
-        } else {
-            gpsChecker();
-        }
+    } else {
+        gpsChecker();
+    }
 
     }
 

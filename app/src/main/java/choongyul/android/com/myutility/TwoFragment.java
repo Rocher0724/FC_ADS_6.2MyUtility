@@ -1,11 +1,15 @@
 package choongyul.android.com.myutility;
 
 
+import android.annotation.TargetApi;
 import android.content.Context;
+import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +17,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.GridLayout;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -23,28 +28,66 @@ import java.util.ArrayList;
  * A simple {@link Fragment} subclass.
  */
 public class TwoFragment extends Fragment {
-    Button btnLength, btnArea, btnWeight;
-    LinearLayout loLength, loArea, loWeight;
 
-    Spinner lengthSp1_1, lengthSp1_2;
-    Spinner lengthSp2_1, lengthSp2_2;
-    Spinner lengthSp3_1, lengthSp3_2;
-    TextView unit1, unit2;
+    private final int LENGTH = 1;
+    private final int AREA = 2;
+    private final int WEIGHT = 3;
 
-    ArrayList<String> length1 = new ArrayList<String>();
-    ArrayList<String> length2 = new ArrayList<String>();
+    private int MODE = LENGTH;
 
-    String change1 = "", change2 = "";
+    private int BEFOREINT = 0;
+    private int AFTERINT = 0;
 
-    EditText edit1_1, edit2_1, edit3_1;
-    TextView edit1_2, edit2_2, edit3_2;
-    TextView ans1_1, ans1_2, ans1_3, ans1_4, ans1_5, ans1_6, ans1_7, ans1_8;
-    TextView ans2_1, ans2_2, ans2_3, ans2_4, ans2_5, ans2_6, ans2_7, ans2_8;
-    TextView ans3_1, ans3_2, ans3_3, ans3_4, ans3_5, ans3_6, ans3_7, ans3_8;
+//    private final String[] LENGTH_LIST = {"밀리미터 (mm)", "센티미터(cm)", "미터(m)", "킬로미터(km)", "인치(in)", "피트(ft)", "야드(yd)", "마일(mile)", "자(尺)", "간(間)", "정(町)", "리(里)", "해리(海里)"};
+//    private final String[] LENGTH_UNITLIST = {"mm", "cm", "m", "km", "in", "ft", "yd", "mile", "尺", "間", "町", "里", "海里"};
+//    private final double[] LENGTH_RAITO = {1, 0.1, 0.001, 1e-6, 0.03937, 0.003281, 0.001094, 6.2137e-7, 0.0033, 0.00055, 9.1667e-6, 2.5463e-6, 5.3996e-7};
+//
+//    private final String[] AREA_LIST = {"제곱미터(m2)", "아르(a)", "헥타르(ha)", "제곱킬로미터(km2)", "제곱피트(ft2)", "제곱야드(yd2)", "에이커(ac)", "평방자", "평", "단보", "정보"};
+//    private final String[] AREA_UNITLIST = {"m2", "a", "ha", "km2", "ft2", "yd2", "ac", "평방자", "평", "단보", "정보"};
+//    private final double[] AREA_RAITO = {1, 0.001, 0.0001, 1e-6, 10.76391, 1.19599, 0.000247, 10.89, 0.3025, 0.001008, 0.000101};
+//
+//    private final String[] WEIGHT_LIST = {"밀리그램(mg)", "그램(g)", "킬로그램(kg)", "톤(t)", "킬로톤(kt)", "그레인(gr)", "온스(oz)", "파운드(lb)", "돈", "냥", "근", "관"};
+//    private final String[] WEIGHT_UNITLIST = {"mg", "g", "kg", "t", "kt", "gr", "oz", "lb", "돈", "냥", "근", "관"};
+//    private final double[] WEIGHT_RAITO = {1, 0.001, 1e-6, 10e-10, 1e-12, 0.015432, 0.000035, 2.2046e-6, 0.000267, 0.000027, 1.6667e-6, 2.6667e-7};
 
+
+    private final String[] LENGTH_LIST = {"밀리미터 (mm)", "센티미터(cm)", "미터(m)", "킬로미터(km)", "인치(in)", "피트(ft)", "야드(yd)", "마일(mile)", "자(尺)", "간(間)", "정(町)", "리(里)", "해리(海里)"};
+    private final String[] LENGTH_UNITLIST = {"mm", "cm", "m", "km", "in", "ft", "yd", "mile", "尺", "間", "町", "里", "海里"};
+    private final double[] LENGTH_RAITO = {1, 0.1, 0.001, 0.000001, 0.03937, 0.003281, 0.001094, 0.00000062137, 0.0033, 0.00055, 0.0000091667, 0.0000025463, 0.00000053996};
+
+    private final String[] AREA_LIST = {"제곱미터(m2)", "아르(a)", "헥타르(ha)", "제곱킬로미터(km2)", "제곱피트(ft2)", "제곱야드(yd2)", "에이커(ac)", "평방자", "평", "단보", "정보"};
+    private final String[] AREA_UNITLIST = {"m2", "a", "ha", "km2", "ft2", "yd2", "ac", "평방자", "평", "단보", "정보"};
+    private final double[] AREA_RAITO = {1, 0.001, 0.0001, 0.000001, 10.76391, 1.19599, 0.000247, 10.89, 0.3025, 0.001008, 0.000101};
+
+    private final String[] WEIGHT_LIST = {"밀리그램(mg)", "그램(g)", "킬로그램(kg)", "톤(t)", "킬로톤(kt)", "그레인(gr)", "온스(oz)", "파운드(lb)", "돈", "냥", "근", "관"};
+    private final String[] WEIGHT_UNITLIST = {"mg", "g", "kg", "t", "kt", "gr", "oz", "lb", "돈", "냥", "근", "관"};
+    private final double[] WEIGHT_RAITO = {1, 0.001, 0.000001, 0.000000001, 0.000000000001, 0.015432, 0.000035, 0.0000022046, 0.000267, 0.000027, 0.0000016667, 0.00000026667};
+
+
+    private Button bt_Length;
+    private Button bt_Area;
+    private Button bt_Weight;
+
+    private TextView tv_title;
+
+    private Spinner spinner_before;
+    private Spinner spinner_after;
+    private Button bt_swipe;
+
+    private EditText ed_input;
+    private TextView tv_before_unit;
+
+    private TextView tv_result;
+    private TextView tv_after_unit;
+
+    private GridLayout gridlayout;
+
+    private ArrayAdapter<String> spinnerAdapter;
+
+    private Context context;
     View view;
-    Context context;
 
+    /////
     public TwoFragment() {
         // Required empty public constructor
     }
@@ -57,411 +100,254 @@ public class TwoFragment extends Fragment {
                              Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_two, container, false);
 
-        btnLength = (Button) view.findViewById(R.id.bx1);
-        btnArea = (Button) view.findViewById(R.id.bx2);
-        btnWeight = (Button) view.findViewById(R.id.bx3);
-
-        loLength = (LinearLayout) view.findViewById(R.id.layoutLength);
-        loArea = (LinearLayout) view.findViewById(R.id.layoutArea);
-        loWeight = (LinearLayout) view.findViewById(R.id.layoutWeight);
-
-        btnLength.setOnClickListener(clickListener);
-        btnArea.setOnClickListener(clickListener);
-        btnWeight.setOnClickListener(clickListener);
-
-        setLengthSpinner();
+        init();
+        modeChanged();
 
 
         return view;
     }
 
-    View.OnClickListener clickListener = new View.OnClickListener() {
+
+    AdapterView.OnItemSelectedListener adapterItemSelected = new AdapterView.OnItemSelectedListener() {
         @Override
-        public void onClick(View view) {
-            loLength.setVisibility(View.GONE);
-            loArea.setVisibility(View.GONE);
-            loWeight.setVisibility(View.GONE);
-            switch (view.getId()) {
-                case R.id.bx1:
-                    length1.clear();
-                    length2.clear();
-                    loLength.setVisibility(View.VISIBLE);
-                    setLengthSpinner();
-                    break;
-                case R.id.bx2:
-                    length1.clear();
-                    length2.clear();
-                    loArea.setVisibility(View.VISIBLE);
-                    setAreaSpinner();
-                    break;
-                case R.id.bx3:
-                    length1.clear();
-                    length2.clear();
-                    loWeight.setVisibility(View.VISIBLE);
-                    break;
-            }
+        public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+            selectedSpinnerItem(adapterView, i);
+        }
+
+        @Override
+        public void onNothingSelected(AdapterView<?> adapterView) {
+
         }
     };
-    public void setLengthSpinner() {
-        edit1_1 = (EditText) view.findViewById(R.id.edit1_1);
-        edit1_2 = (TextView) view.findViewById(R.id.edit1_2);
 
-        ans1_1 = (TextView) view.findViewById(R.id.answer1_1);
-        ans1_2 = (TextView) view.findViewById(R.id.answer1_2);
-        ans1_3 = (TextView) view.findViewById(R.id.answer1_3);
-        ans1_4 = (TextView) view.findViewById(R.id.answer1_4);
-        ans1_5 = (TextView) view.findViewById(R.id.answer1_5);
-        ans1_6 = (TextView) view.findViewById(R.id.answer1_6);
-        ans1_7 = (TextView) view.findViewById(R.id.answer1_7);
-        ans1_8 = (TextView) view.findViewById(R.id.answer1_8);
+    private void init() {
+        bt_Length = (Button) view.findViewById(R.id.bt_Length);
+        bt_Area = (Button) view.findViewById(R.id.bt_Area);
+        bt_Weight = (Button) view.findViewById(R.id.bt_Weight);
 
-        lengthSp1_1 = (Spinner) view.findViewById(R.id.sp1_1);
-        lengthSp1_2 = (Spinner) view.findViewById(R.id.sp1_2);
-        unit1 = (TextView) view.findViewById(R.id.unit1_1);
-        unit2 = (TextView) view.findViewById(R.id.unit1_2);
+        tv_title = (TextView) view.findViewById(R.id.tv_title);
+        spinner_before = (Spinner) view.findViewById(R.id.spinner_before);
+        spinner_after = (Spinner) view.findViewById(R.id.spinner_after);
+        bt_swipe = (Button) view.findViewById(R.id.bt_swipe);
+        ed_input = (EditText) view.findViewById(R.id.ed_input);
+        tv_before_unit = (TextView) view.findViewById(R.id.tv_before_unit);
+        tv_result = (TextView) view.findViewById(R.id.tv_result);
+        tv_after_unit = (TextView) view.findViewById(R.id.tv_after_unit);
+        gridlayout = (GridLayout) view.findViewById(R.id.gridlayout);
 
-        String length[] = {"밀리미터(mm)", "센치미터(cm)", "미터(m)", "킬로미터(km)", "인치(in)", "피트(ft)", "야드(yd)", "마일(mile)"};
-        for (int i = 0; i < length.length; i++) {
-            length1.add(length[i]);
-        }
-        for (int i = 0; i < length.length; i++) {
-            length2.add(length[i]);
-        }
+        bt_Length.setOnClickListener(settingBtns_OnClick);
+        bt_Area.setOnClickListener(settingBtns_OnClick);
+        bt_Weight.setOnClickListener(settingBtns_OnClick);
+        bt_swipe.setOnClickListener(swipeButton_OnCLick);
 
-        ArrayAdapter<String> lengthAdapter1 = new ArrayAdapter<String>(context, android.R.layout.simple_spinner_dropdown_item, length1);
-        lengthSp1_1.setAdapter(lengthAdapter1);
-        ArrayAdapter<String> lengthAdapter2 = new ArrayAdapter<String>(context, android.R.layout.simple_spinner_dropdown_item, length2);
-        lengthSp1_2.setAdapter(lengthAdapter2);
+        spinnerAdapter = new ArrayAdapter<String>(context, android.R.layout.simple_spinner_dropdown_item);
 
-        lengthSp1_1.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                change1 = length1.get(i);
-                unit1.setText(change1);
-                calculateLength(change1, change2);
-            }
+        spinner_before.setAdapter(spinnerAdapter);
+        spinner_after.setAdapter(spinnerAdapter);
 
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-                change1 = length1.get(0);
-                unit1.setText(change1);
-                calculateLength(change1, change2);
-            }
-        });
+        spinner_after.setOnItemSelectedListener(adapterItemSelected);
+        spinner_before.setOnItemSelectedListener(adapterItemSelected);
 
-        lengthSp1_2.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                change2 = length2.get(i);
-                unit2.setText(change2);
-                calculateLength(change1, change2);
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-                change2 = length2.get(0);
-                unit2.setText(change2);
-                calculateLength(change1, change2);
-            }
-        });
+        ed_input.addTextChangedListener(input_OnChange);
     }
 
-    public void calculateLength(String str1, String str2) {
-        edit1_1.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+    private View.OnClickListener swipeButton_OnCLick = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            int temp = AFTERINT;
+            AFTERINT = BEFOREINT;
+            BEFOREINT = temp;
 
-            }
+            spinner_after.setSelection(AFTERINT);
+            spinner_before.setSelection(BEFOREINT);
 
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                calculateLength(change1, change2);
-            }
+            selectedSpinnerItem(spinner_before, BEFOREINT);
+            selectedSpinnerItem(spinner_after, AFTERINT);
+        }
+    };
 
-            @Override
-            public void afterTextChanged(Editable editable) {
+    private TextWatcher input_OnChange = new TextWatcher() {
+        @Override
+        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
-            }
-        });
-
-        double get = 0;
-        if (!(edit1_1.getText().toString().equals(""))) {
-            get = Double.parseDouble(edit1_1.getText().toString());
         }
 
-        if (str1.equals("밀리미터(mm)")) {
-            ans1_1.setText(String.valueOf(get));
-            ans1_2.setText(String.valueOf(get * 0.1));
-            ans1_3.setText(String.valueOf(get * 0.001));
-            ans1_4.setText(String.valueOf(get * 0.0000001));
-            ans1_5.setText(String.valueOf(get / 25.4));
-            ans1_6.setText(String.valueOf(get / 304.8));
-            ans1_7.setText(String.valueOf(get / 914.4));
-            ans1_8.setText(String.valueOf(get / 1609344));
-        } else if (str1.equals("센치미터(cm)")) {
-            ans1_1.setText(String.valueOf(get * 10));
-            ans1_2.setText(String.valueOf(get));
-            ans1_3.setText(String.valueOf(get / 100));
-            ans1_4.setText(String.valueOf(get / 100000));
-            ans1_5.setText(String.valueOf(get / 254));
-            ans1_6.setText(String.valueOf(get / 3048));
-            ans1_7.setText(String.valueOf(get / 9144));
-            ans1_8.setText(String.valueOf(get / 16093440));
-        } else if (str1.equals("미터(m)")) {
-            ans1_1.setText(String.valueOf(get * 1000));
-            ans1_2.setText(String.valueOf(get * 100));
-            ans1_3.setText(String.valueOf(get));
-            ans1_4.setText(String.valueOf(get / 1000));
-            ans1_5.setText(String.valueOf(get / 0.0254));
-            ans1_6.setText(String.valueOf(get / 0.3048));
-            ans1_7.setText(String.valueOf(get / 0.9144));
-            ans1_8.setText(String.valueOf(get * 0.000621));
-        } else if (str1.equals("킬로미터(km)")) {
-            ans1_1.setText(String.valueOf(get * 1000000));
-            ans1_2.setText(String.valueOf(get * 100000));
-            ans1_3.setText(String.valueOf(get * 1000));
-            ans1_4.setText(String.valueOf(get));
-            ans1_5.setText(String.valueOf(get * 39370.0787));
-            ans1_6.setText(String.valueOf(get * 3280.8399));
-            ans1_7.setText(String.valueOf(get * 1093.6133));
-            ans1_8.setText(String.valueOf(get * 0.621371));
-        } else if (str1.equals("인치(in)")) {
-            ans1_1.setText(String.valueOf(get * 25.4));
-            ans1_2.setText(String.valueOf(get * 2.54));
-            ans1_3.setText(String.valueOf(get * 0.0254));
-            ans1_4.setText(String.valueOf(get * 0.000025));
-            ans1_5.setText(String.valueOf(get));
-            ans1_6.setText(String.valueOf(get * 0.083333));
-            ans1_7.setText(String.valueOf(get * 0.027778));
-            ans1_8.setText(String.valueOf(get * 0.000016));
-        } else if (str1.equals("피트(ft)")) {
-            ans1_1.setText(String.valueOf(get * 304.8));
-            ans1_2.setText(String.valueOf(get * 30.48));
-            ans1_3.setText(String.valueOf(get * 0.3048));
-            ans1_4.setText(String.valueOf(get * 0.000305));
-            ans1_5.setText(String.valueOf(get * 12));
-            ans1_6.setText(String.valueOf(get));
-            ans1_7.setText(String.valueOf(get * 0.333333));
-            ans1_8.setText(String.valueOf(get * 0.000189));
-        } else if (str1.equals("야드(yd)")) {
-            ans1_1.setText(String.valueOf(get * 914.4));
-            ans1_2.setText(String.valueOf(get * 91.44));
-            ans1_3.setText(String.valueOf(get * 0.9144));
-            ans1_4.setText(String.valueOf(get * 0.000914));
-            ans1_5.setText(String.valueOf(get * 36));
-            ans1_6.setText(String.valueOf(get * 3));
-            ans1_7.setText(String.valueOf(get));
-            ans1_8.setText(String.valueOf(get * 0.000568));
-        } else if (str1.equals("마일(mile)")) {
-            ans1_1.setText(String.valueOf(get * 1609344));
-            ans1_2.setText(String.valueOf(get * 160934.4));
-            ans1_3.setText(String.valueOf(get * 1609.344));
-            ans1_4.setText(String.valueOf(get * 1.609344));
-            ans1_5.setText(String.valueOf(get * 63360));
-            ans1_6.setText(String.valueOf(get * 5280));
-            ans1_7.setText(String.valueOf(get * 1760));
-            ans1_8.setText(String.valueOf(get));
+        @Override
+        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            if(ed_input.getText().toString().length() == 0) {
+                ed_input.setText("0");
+            }
+            String[] unit = null;
+            String[] list = null;
+            double[] raito = null;
+            switch (MODE) {
+                case LENGTH :
+                    unit = LENGTH_UNITLIST;
+                    list = LENGTH_LIST;
+                    raito = LENGTH_RAITO;
+                    break;
+                case AREA :
+                    unit = AREA_UNITLIST;
+                    list = AREA_LIST;
+                    raito = AREA_RAITO;
+                    break;
+                case WEIGHT :
+                    unit = WEIGHT_UNITLIST;
+                    list = WEIGHT_LIST;
+                    raito = WEIGHT_RAITO;
+                    break;
+            }
+            calculate(list, unit, raito);
         }
 
-        if (str2.equals("밀리미터(mm)")) {
-            edit1_2.setText(ans1_1.getText());
-        } else if (str2.equals("센치미터(cm)")) {
-            edit1_2.setText(ans1_2.getText());
-        } else if (str2.equals("미터(m)")) {
-            edit1_2.setText(ans1_3.getText());
-        } else if (str2.equals("킬로미터(km)")) {
-            edit1_2.setText(ans1_4.getText());
-        } else if (str2.equals("인치(in)")) {
-            edit1_2.setText(ans1_5.getText());
-        } else if (str2.equals("피트(ft)")) {
-            edit1_2.setText(ans1_6.getText());
-        } else if (str2.equals("야드(yd)")) {
-            edit1_2.setText(ans1_7.getText());
-        } else if (str2.equals("마일(mile)")) {
-            edit1_2.setText(ans1_8.getText());
+        @Override
+        public void afterTextChanged(Editable editable) {
+
+        }
+    };
+
+    private View.OnClickListener settingBtns_OnClick = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            switch (view.getId()) {
+                case R.id.bt_Length:
+                    MODE = LENGTH;
+                    break;
+                case R.id.bt_Area:
+                    MODE = AREA;
+                    break;
+                case R.id.bt_Weight:
+                    MODE = WEIGHT;
+                    break;
+            }
+            modeChanged();
+        }
+    };
+
+    private void selectedSpinnerItem(AdapterView adapterView, int i) {
+        String[] unit = null;
+        String[] list = null;
+        double[] raito = null;
+        switch (MODE) {
+            case LENGTH :
+                unit = LENGTH_UNITLIST;
+                list = LENGTH_LIST;
+                raito = LENGTH_RAITO;
+                break;
+            case AREA :
+                unit = AREA_UNITLIST;
+                list = AREA_LIST;
+                raito = AREA_RAITO;
+                break;
+            case WEIGHT :
+                unit = WEIGHT_UNITLIST;
+                list = WEIGHT_LIST;
+                raito = WEIGHT_RAITO;
+                break;
         }
 
+        switch (adapterView.getId()) {
+            case R.id.spinner_before:
+                BEFOREINT = i;
+                tv_before_unit.setText(unit[i]);
+                break;
+            case R.id.spinner_after:
+                AFTERINT = i;
+                tv_after_unit.setText(unit[i]);
+                break;
+        }
+        calculate(list, unit, raito);
+    }
+
+    private void calculate(String[] list, String[] unit, double[] raito) {
+        double[] result = new double[list.length];
+
+        double input = Double.parseDouble(ed_input.getText().toString());
+        double inputmm = input / raito[BEFOREINT];
+        for(int i=0;i<list.length;i++) {
+            result[i] = (Math.round(inputmm * raito[i] * 100000))/100000.0;
+        }
+        tv_result.setText(result[AFTERINT] + "");
+        setGridLists(result, list);
+    }
+
+    private void setGridLists(double[] result, String[] list) {
+        gridlayout.removeAllViews();
+        for(int i=0;i<list.length;i++) {
+            gridlayout.addView(getGridItem(i, result[i] + "", list[i]));
+        }
+    }
+
+    private void modeChanged() {
+        spinnerAdapter.clear();
+        BEFOREINT = 0;
+        AFTERINT = 0;
+        switch (MODE) {
+            case LENGTH:
+                setModeLENGTH();
+                break;
+            case AREA:
+                setModeAREA();
+                break;
+            case WEIGHT:
+                setModeWeight();
+                break;
+        }
+        spinnerAdapter.notifyDataSetChanged();
+        spinner_before.setSelection(BEFOREINT);
+        spinner_after.setSelection(AFTERINT);
+
+        selectedSpinnerItem(spinner_before, BEFOREINT);
+        selectedSpinnerItem(spinner_after, AFTERINT);
+    }
+
+    private void setModeLENGTH() {
+        tv_title.setText("Length");
+        spinnerAdapter.addAll(LENGTH_LIST);
+    }
+
+    private void setModeAREA() {
+        tv_title.setText("Area");
+        spinnerAdapter.addAll(AREA_LIST);
+    }
+
+    private void setModeWeight() {
+        tv_title.setText("Weight");
+        spinnerAdapter.addAll(WEIGHT_LIST);
     }
 
 
+    private LinearLayout getGridItem(int count, String result, String unit) {
+        TextView tv_result = new TextView(context);
+        tv_result.setGravity(Gravity.RIGHT);
+        tv_result.setTextColor(Color.argb(0xff,0xff,0x00,0x00));
+        tv_result.setTextSize(15);
+        tv_result.setText(result);
 
-    public void setAreaSpinner() {
-        edit2_1 = (EditText)view.findViewById(R.id.edit2_1);
-        edit2_2 = (TextView)view.findViewById(R.id.edit2_2);
+        TextView tv_unit = new TextView(context);
+        LinearLayout.LayoutParams unit_params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        unit_params.setMargins(5,0,0,0);
+        tv_unit.setLayoutParams(unit_params);
+        tv_unit.setTextSize(15);
+        tv_unit.setText(unit);
 
-        ans2_1 = (TextView)view.findViewById(R.id.answer2_1);
-        ans2_2 = (TextView)view.findViewById(R.id.answer2_2);
-        ans2_3 = (TextView)view.findViewById(R.id.answer2_3);
-        ans2_4 = (TextView)view.findViewById(R.id.answer2_4);
-        ans2_5 = (TextView)view.findViewById(R.id.answer2_5);
-        ans2_6 = (TextView)view.findViewById(R.id.answer2_6);
-        ans2_7 = (TextView)view.findViewById(R.id.answer2_7);
-        ans2_8 = (TextView)view.findViewById(R.id.answer2_8);
+        LinearLayout linearLayout = new LinearLayout(context);
 
-        lengthSp2_1 = (Spinner)view.findViewById(R.id.sp2_1);
-        lengthSp2_2 = (Spinner)view.findViewById(R.id.sp2_2);
-        unit1 = (TextView)view.findViewById(R.id.unit2_1);
-        unit2 = (TextView)view.findViewById(R.id.unit2_2);
+        linearLayout.setOrientation(LinearLayout.HORIZONTAL);
 
-        String length[] = {"제곱미터(m^2)", "아르(a)", "헥타르(ha)", "제곱킬로미터(km^2)", "제곱피트(ft^2)", "제곱야드(yd^2)", "에이커(ac)", "평방자"};
-        for(int i=0;i<length.length;i++) {
-            length1.add(length[i]);
-        }
-        for(int i=0;i<length.length;i++) {
-            length2.add(length[i]);
-        }
+        GridLayout.LayoutParams param =new GridLayout.LayoutParams();
+        param.height = GridLayout.LayoutParams.WRAP_CONTENT;
+        param.width = GridLayout.LayoutParams.WRAP_CONTENT;
+        param.columnSpec = GridLayout.spec(count % 2, 1, 0.5f);
+        linearLayout.setLayoutParams(param);
+        linearLayout.setPadding(5,5,5,5);
 
-        ArrayAdapter<String> lengthAdapter1 = new ArrayAdapter<String>(context, android.R.layout.simple_spinner_dropdown_item, length1);
-        lengthSp2_1.setAdapter(lengthAdapter1);
-        ArrayAdapter<String> lengthAdapter2 = new ArrayAdapter<String>(context, android.R.layout.simple_spinner_dropdown_item, length2);
-        lengthSp2_2.setAdapter(lengthAdapter2);
-
-        lengthSp2_1.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                change1 = length1.get(i);
-                unit1.setText(change1);
-                calculateArea(change1, change2);
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-                change1 = length1.get(0);
-                unit1.setText(change1);
-                calculateArea(change1, change2);
-            }
-        });
-
-        lengthSp2_2.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                change2 = length2.get(i);
-                unit2.setText(change2);
-                calculateArea(change1, change2);
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-                change2 = length2.get(0);
-                unit2.setText(change2);
-                calculateArea(change1, change2);
-            }
-        });
+        linearLayout.addView(tv_result);
+        linearLayout.addView(tv_unit);
+        return linearLayout;
     }
 
-    public void calculateArea(String str1, String str2) {
-        edit2_1.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                calculateArea(change1, change2);
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-
-            }
-        });
-
-        double get = 0;
-        if(!(edit2_1.getText().toString().equals(""))) {
-            get = Double.parseDouble(edit2_1.getText().toString());
-        }
-
-        if(str1.equals("제곱미터(m^2)")) {
-            ans2_1.setText(String.valueOf(get));
-            ans2_2.setText(String.valueOf(get*0.01));
-            ans2_3.setText(String.valueOf(get*0.0001));
-            ans2_4.setText(String.valueOf(get*0.0000001));
-            ans2_5.setText(String.valueOf(get*10.76391));
-            ans2_6.setText(String.valueOf(get*1.19599));
-            ans2_7.setText(String.valueOf(get*0.000247));
-            ans2_8.setText(String.valueOf(get*10.89));
-        } else if(str1.equals("아르(a)")) {
-            ans2_1.setText(String.valueOf(get*100));
-            ans2_2.setText(String.valueOf(get));
-            ans2_3.setText(String.valueOf(get*0.01));
-            ans2_4.setText(String.valueOf(get*0.0001));
-            ans2_5.setText(String.valueOf(get*1076.39104));
-            ans2_6.setText(String.valueOf(get*119.599005));
-            ans2_7.setText(String.valueOf(get*0.024711));
-            ans2_8.setText(String.valueOf(get*1089));
-        } else if(str1.equals("헥타르(ha)")) {
-            ans2_1.setText(String.valueOf(get*10000));
-            ans2_2.setText(String.valueOf(get*100));
-            ans2_3.setText(String.valueOf(get));
-            ans2_4.setText(String.valueOf(get*0.01));
-            ans2_5.setText(String.valueOf(get*107639.104));
-            ans2_6.setText(String.valueOf(get*11959.9005));
-            ans2_7.setText(String.valueOf(get*2.471054));
-            ans2_8.setText(String.valueOf(get*108900));
-        } else if(str1.equals("제곱킬로미터(km^2)")) {
-            ans2_1.setText(String.valueOf(get*1000000));
-            ans2_2.setText(String.valueOf(get*10000));
-            ans2_3.setText(String.valueOf(get*100));
-            ans2_4.setText(String.valueOf(get));
-            ans2_5.setText(String.valueOf(get*10763910.4));
-            ans2_6.setText(String.valueOf(get*1195990.05));
-            ans2_7.setText(String.valueOf(get*247.105381));
-            ans2_8.setText(String.valueOf(get*10890000));
-        } else if(str1.equals("제곱피트(ft^2)")) {
-            ans2_1.setText(String.valueOf(get*0.092903));
-            ans2_2.setText(String.valueOf(get*0.000929));
-            ans2_3.setText(String.valueOf(get*0.0000092903));
-            ans2_4.setText(String.valueOf(get*0.000000092903));
-            ans2_5.setText(String.valueOf(get));
-            ans2_6.setText(String.valueOf(get*0.111111));
-            ans2_7.setText(String.valueOf(get*0.000023));
-            ans2_8.setText(String.valueOf(get*1.011714));
-        } else if(str1.equals("제곱야드(yd^2)")) {
-            ans2_1.setText(String.valueOf(get*0.836127));
-            ans2_2.setText(String.valueOf(get*0.008361));
-            ans2_3.setText(String.valueOf(get*0.000084));
-            ans2_4.setText(String.valueOf(get*8.3613e-7));
-            ans2_5.setText(String.valueOf(get*9));
-            ans2_6.setText(String.valueOf(get));
-            ans2_7.setText(String.valueOf(get*0.000207));
-            ans2_8.setText(String.valueOf(get*9.105427));
-        } else if(str1.equals("에이커(ac)")) {
-            ans2_1.setText(String.valueOf(get*4046.85642));
-            ans2_2.setText(String.valueOf(get*40.468564));
-            ans2_3.setText(String.valueOf(get*0.404686));
-            ans2_4.setText(String.valueOf(get*0.004047));
-            ans2_5.setText(String.valueOf(get*43560));
-            ans2_6.setText(String.valueOf(get*4840));
-            ans2_7.setText(String.valueOf(get));
-            ans2_8.setText(String.valueOf(get*44070.2664));
-        } else if(str1.equals("평방자")) {
-            ans2_1.setText(String.valueOf(get*0.091827));
-            ans2_2.setText(String.valueOf(get*0.000918));
-            ans2_3.setText(String.valueOf(get*9.1827e-6));
-            ans2_4.setText(String.valueOf(get*9.1827e-8));
-            ans2_5.setText(String.valueOf(get*0.988422));
-            ans2_6.setText(String.valueOf(get*0.109825));
-            ans2_7.setText(String.valueOf(get*0.000023));
-            ans2_8.setText(String.valueOf(get));
-        }
-
-        if(str2.equals("제곱미터(m^2)")) {
-            edit2_2.setText(ans2_1.getText());
-        } else if(str2.equals("아르(a)")) {
-            edit2_2.setText(ans2_2.getText());
-        } else if(str2.equals("헥타르(ha)")) {
-            edit2_2.setText(ans2_3.getText());
-        } else if(str2.equals("제곱킬로미터(km^2)")) {
-            edit2_2.setText(ans2_4.getText());
-        } else if(str2.equals("제곱피트(ft^2)")) {
-            edit2_2.setText(ans2_5.getText());
-        } else if(str2.equals("제곱야드(yd^2)")) {
-            edit2_2.setText(ans2_6.getText());
-        } else if(str2.equals("에이커(ac)")) {
-            edit2_2.setText(ans2_7.getText());
-        } else if(str2.equals("평방자")) {
-            edit2_2.setText(ans2_8.getText());
-        }
-    }
 }
+
+
