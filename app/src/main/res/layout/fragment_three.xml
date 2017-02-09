@@ -5,12 +5,31 @@
     tools:context="choongyul.android.com.myutility.MainActivity">
 
     <!-- TODO: Update blank fragment layout -->
+    <!--<Button-->
+        <!--android:text="&lt;"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:id="@+id/backBtn"-->
+        <!--android:textAppearance="@style/TextAppearance.AppCompat.Large"/>-->
+
 
     <WebView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/webView"
-        android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentStart="true"/>
+        <!--android:layout_below="@+id/backBtn" />-->
+
+    <!--<EditText-->
+        <!--android:layout_height="48dp"-->
+
+        <!--android:inputType="textPersonName"-->
+        <!--android:ems="10"-->
+        <!--android:id="@+id/urlEt"-->
+        <!--android:hint="http://"-->
+        <!--android:layout_width="200dp"-->
+        <!--android:layout_alignParentTop="true"-->
+        <!--android:layout_toRightOf="@+id/backBtn"-->
+        <!--android:layout_toEndOf="@+id/backBtn" />-->
 </RelativeLayout>

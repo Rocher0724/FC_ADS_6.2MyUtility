@@ -20,6 +20,9 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+import java.util.Stack;
+
 public class MainActivity extends AppCompatActivity {
 
     // 탭 및 페이저 속성 정의
@@ -29,8 +32,12 @@ public class MainActivity extends AppCompatActivity {
     ThreeFragment three;
     FourFragment four;
 
-
     private final int REQ_CODE = 100;
+    private int page_position = 0;
+    Stack<Integer> pageStack = new Stack<>();
+    ViewPager viewPager;
+    Boolean backPressed = false;
+
 
     private LocationManager manager;
     public LocationManager getLoactionManager() {
@@ -67,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
         tabLayout.addTab( tabLayout.newTab().setText("현재위치"));
 
         //프래그먼트 페이저 작성
-        ViewPager viewPager = (ViewPager) findViewById(R.id.viewPager);
+        viewPager = (ViewPager) findViewById(R.id.viewPager);
         //아답터 생성
         PagerAdapter adapter = new PagerAdapter(getSupportFragmentManager());
         //아답터 세팅
@@ -76,7 +83,30 @@ public class MainActivity extends AppCompatActivity {
         // 1. 페이저가 변경 되었을때 탭을 바꿔주는 리스너
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
 
-        // 2. 탭이 변경되었을 때 페이지를 바꿔주는 리스너
+        // 2. 페이지의 변경사항을 체크한다.
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                if ( !backPressed ){
+                    pageStack.push(position);
+                } else {
+                    backPressed = false;
+                }
+                page_position = position;
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
+
+        // 3. 탭이 변경되었을 때 페이지를 바꿔주는 리스너
         tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(viewPager));
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -198,6 +228,34 @@ public class MainActivity extends AppCompatActivity {
                 // 선택 : 1 종료, 2 권한체크 다시물어보기 할수도 있다. 일단은 끝내기
                 finish();
             }
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+//        super.onBackPressed();
+        switch (page_position) {
+            case 2:
+                // 뒤로가기가 가능하면 아무런 동작을 하지않는다.
+                if (three.goBack()) {
+
+                } else { // 뒤로가기가 안되면 앱을 닫는다.
+                    goBackStack();
+                }
+                break;
+            // 위 조건에 해당되지않는 케이스는 아래 로직을 처리한다.
+            default:
+                goBackStack();
+                break;
+        }
+    }
+
+    private void goBackStack() {
+        if (pageStack.size()<1){
+            super.onBackPressed();
+        } else {
+            backPressed = true;
+            viewPager.setCurrentItem(pageStack.pop());
         }
     }
 }
