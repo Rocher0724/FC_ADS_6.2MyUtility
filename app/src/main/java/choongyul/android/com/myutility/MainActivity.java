@@ -23,14 +23,17 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.Stack;
 
-public class MainActivity extends AppCompatActivity {
+import choongyul.android.com.myutility.dummy.DummyContent;
+
+public class MainActivity extends AppCompatActivity implements FiveFragment.OnListFragmentInteractionListener{
 
     // 탭 및 페이저 속성 정의
-    final int TAB_COUNT = 4;
+    final int TAB_COUNT = 5;
     OneFragment one;
     TwoFragment two;
     ThreeFragment three;
     FourFragment four;
+    FiveFragment five;
 
     private final int REQ_CODE = 100;
     private int page_position = 0;
@@ -65,6 +68,7 @@ public class MainActivity extends AppCompatActivity {
 
         three = new ThreeFragment();
         four = new FourFragment();
+        five = FiveFragment.newInstance(3); // 미리 정해진 그리드 가로축 갯수
 
         //탭 레이아웃 정의
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tab);
@@ -72,6 +76,8 @@ public class MainActivity extends AppCompatActivity {
         tabLayout.addTab( tabLayout.newTab().setText("단위변환"));
         tabLayout.addTab( tabLayout.newTab().setText("검색"));
         tabLayout.addTab( tabLayout.newTab().setText("현재위치"));
+        tabLayout.addTab( tabLayout.newTab().setText("갤러리"));
+
 
         //프래그먼트 페이저 작성
         viewPager = (ViewPager) findViewById(R.id.viewPager);
@@ -111,9 +117,10 @@ public class MainActivity extends AppCompatActivity {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             checkPermission();
-    } else {
-        gpsChecker();
-    }
+        } else {
+            gpsChecker();
+        }
+
 
     }
 
@@ -170,6 +177,11 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    public void onListFragmentInteraction(DummyContent.DummyItem item) {
+
+    }
+
     class PagerAdapter extends FragmentStatePagerAdapter {
 
         public PagerAdapter(FragmentManager fm) {
@@ -184,6 +196,7 @@ public class MainActivity extends AppCompatActivity {
                 case 1: fragment = two; break;
                 case 2: fragment = three; break;
                 case 3: fragment = four; break;
+                case 4: fragment = five; break;
             }
             return fragment;
         }
@@ -199,10 +212,15 @@ public class MainActivity extends AppCompatActivity {
     private void checkPermission() {
         // 1.1 런타임 권한체크 (권한을 추가할때 1.2 목록작성과 2.1 권한체크에도 추가해야한다.)
         if ( checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                || checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                || checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                || checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
+                || checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
 
             // 1.2 요청할 권한 목록 작성
-            String permArr[] = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
+            String permArr[] = {Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                    Manifest.permission.CAMERA};
 
             // 1.3 시스템에 권한요청
             requestPermissions(permArr, REQ_CODE);
@@ -220,7 +238,9 @@ public class MainActivity extends AppCompatActivity {
         if( requestCode == REQ_CODE) {
             // 2.1 배열에 넘긴 런타임 권한을 체크해서 승인이 됐으면
             if(grantResults[0] == PackageManager.PERMISSION_GRANTED
-                    && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
+                    && grantResults[1] == PackageManager.PERMISSION_GRANTED
+                    && grantResults[2] == PackageManager.PERMISSION_GRANTED
+                    && grantResults[3] == PackageManager.PERMISSION_GRANTED) {
                 // 2.2 프로그램 실행
                 gpsChecker();
             } else {
