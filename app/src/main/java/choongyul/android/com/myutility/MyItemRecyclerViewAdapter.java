@@ -30,40 +30,14 @@ import java.util.List;
  */
 public class MyItemRecyclerViewAdapter extends RecyclerView.Adapter<MyItemRecyclerViewAdapter.ViewHolder> {
 
-    private final List<String> mDatas = new ArrayList<>();
-    private final OnListFragmentInteractionListener mListener;
+    private List<String> mDatas = new ArrayList<>();
     private final Context context;
 
-    public MyItemRecyclerViewAdapter(Context context, OnListFragmentInteractionListener listener) {
-        mListener = listener;
+    public MyItemRecyclerViewAdapter(Context context, List<String> datas) {
         this.context = context;
+        mDatas = datas;
 
-        // 폰에서 이미지를 가져온 후 datas에 세팅한다.
-        ContentResolver resolver = context.getContentResolver();
-        // 1. 데이터 uri 정의
-        Uri target = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-        // 2. projection 정의
-        String projection[] = {MediaStore.Images.Media.DATA}; // 이미지 경로가 있는 컬럼 명이 데이터가 됨.
-        // 섬네일을 가져오는방법
-//        String projection[] = {MediaStore.Images.Thumbnails.DATA};
-
-        // 3. 데이터 가져오기
-        Cursor cursor = resolver.query(target, projection, null,null,null);
-        // 4. 데이터에 담아주기
-        if(cursor != null) {
-            while (cursor.moveToNext()) {
-                // 데이터 컬럼이 0번인덱스에만 있는 것을 알기때문에 이렇게 하였음
-                String uriString = cursor.getString(0);
-                // 가져온 str을 uri로 파싱
-                mDatas.add(uriString);
-            }
-            cursor.close();
-        }
     }
-
-//    private static Uri getImageSimple(String id) {
-//        return Uri.parse("content://media/external/images/media/" + id);
-//    }
 
 
     @Override
@@ -75,6 +49,7 @@ public class MyItemRecyclerViewAdapter extends RecyclerView.Adapter<MyItemRecycl
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
+        // 최신자료부터 집어넣도록 순서 역순으로 세팅
         holder.imageUri = mDatas.get(position);
 //        holder.imageView.setImageURI(holder.imageUri);
         Glide.with(context).load(holder.imageUri).into(holder.imageView);
